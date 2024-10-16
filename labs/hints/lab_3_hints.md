@@ -19,16 +19,16 @@ The API was changed from `kv:namespace` to `kv namespace` in newer versions of W
 
 ## How do I insert a JSON to KV without <form> implemented yet?
 
-Run this in CLI to insert in local KV (notice `--local`):
+Run this in CLI to insert in local KV (notice `--local` and `--preview`):
 
 ```
 npx wrangler kv:key put --preview --local --binding SHORT_URLS "url:remix" '{"url":"https://remix.run","shortUrl":"remix"}'
 ```
 
-Run this in CLI to insert in remote KV:
+Run this in CLI to insert in remote KV (remove `--preview` for production environment):
 
 ```
-npx wrangler kv:key put --preview --local --binding SHORT_URLS "url:remix" '{"url":"https://remix.run","shortUrl":"remix"}'
+npx wrangler kv:key put --preview --binding SHORT_URLS "url:remix" '{"url":"https://remix.run","shortUrl":"remix"}'
 ```
 
 **Note:**
