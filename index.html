@@ -1,14 +1,475 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/><title>Loading...</title></head><body><main style="font-family:system-ui, sans-serif;padding:2rem"><script>
-              console.log(
-                "💿 Hey developer 👋. You can provide a way better UX than this " +
-                "when your app is loading JS modules and/or running `clientLoader` " +
-                "functions. Check out https://remix.run/route/hydrate-fallback " +
-                "for more information."
-              );
-            </script><link rel="modulepreload" href="/assets/manifest-f9e8d797.js"/><link rel="modulepreload" href="/assets/entry.client-DG5Jeu9w.js"/><link rel="modulepreload" href="/assets/components-89jrYwCS.js"/><link rel="modulepreload" href="/assets/root-Dhh6wUm2.js"/><script>window.__remixContext = {"basename":"/","future":{"v3_fetcherPersist":false,"v3_relativeSplatPath":false,"v3_throwAbortReason":false,"v3_singleFetch":false,"v3_lazyRouteDiscovery":false,"unstable_optimizeDeps":false},"isSpaMode":true,"state":{"loaderData":{"root":null},"actionData":null,"errors":null}};</script><script type="module" async="">import "/assets/manifest-f9e8d797.js";
-import * as route0 from "/assets/root-Dhh6wUm2.js";
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
 
-window.__remixRouteModules = {"root":route0};
+    <title>Remix Workshop</title>
 
-import("/assets/entry.client-DG5Jeu9w.js");</script></main></body></html>
+    <meta name="description" content="OpenSlava 2024 Remix Hands-on Lab" />
+    <meta name="author" content="github.com/pavestru" />
+
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" href="dist/reset.css" />
+    <link rel="stylesheet" href="dist/reveal.css" />
+    <link rel="stylesheet" href="dist/theme/black.css" id="theme" />
+
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="plugin/highlight/monokai.css" />
+  </head>
+
+  <body>
+    <div class="reveal">
+      <!-- Any section element inside of this container is displayed as a slide -->
+      <div class="slides">
+        <!-- ----------------------------------------------------- -->
+        <!-- Intro -->
+
+        <section data-background-color="#212121">
+          <img src="images/Remix_Logo_Dark_Glowing.png" height="auto" width="500" />
+          <h1>Workshop</h1>
+          Find this presentation at
+          <a href="https://pavestru.github.io/remix-workshop" target="_blank">
+            https://pavestru.github.io/remix-workshop
+          </a>
+        </section>
+        <section>
+          <h2>Your trainers</h2>
+          <p>Pavel Struhár</p>
+          <p>Ján Capiak</p>
+        </section>
+        <section>
+          <h2>Objective</h2>
+          <p>Learn how to build a simple full-stack application using Remix.</p>
+        </section>
+        <section>
+          <h2>Application requirements</h2>
+          <p>Build a URL shortener application with dashboard UI</p>
+          <ul>
+            <li class="fragment">
+              Authenticated users can create, update, delete, list shortened
+              URLs.
+            </li>
+            <li class="fragment">
+              Everyone can access the shortened URL and be redirected to a
+              destination (long URL).
+            </li>
+            <li class="fragment">
+              e.g.
+              <a href="https://rmx.sk/workshop" target="_blank">
+                https://rmx.sk/<strong>workshop</strong>
+              </a>
+              points to
+              <a
+                href="https://github.com/pavestru/remix-workshop"
+                target="_blank"
+              >
+                https://github.com/pavestru/remix-workshop
+              </a>
+            </li>
+          </ul>
+        </section>
+        <section>
+          <h1>Demo</h1>
+          <p>
+            <a href="https://remix-workshop.pages.dev" target="_blank"
+              >https://remix-workshop.pages.dev</a
+            >
+          </p>
+        </section>
+        <section>
+          <h2>Agenda</h2>
+          <ul>
+            <li>9:00 - 9:15 Introduction</li>
+            <li>9:15 - 9:45 Lab 1: App scaffolding (Cloudflare)</li>
+            <li>9:45 - 10:15 Lab 2: Authentication (Supabase)</li>
+            <li>10:15 - 11:00 Lab 3: Data fetching</li>
+            <li>11:00 - 11:30 Lab 4: Forms</li>
+            <li>11:30 - 12:00 Wrap-up</li>
+          </ul>
+        </section>
+
+        <!-- ----------------------------------------------------- -->
+        <!-- Module 1 -->
+
+        <section>
+          <h2>Prerequisites</h2>
+          <ul>
+            <li>Node.js + npm</li>
+            <li>Cloudflare account</li>
+            <li>Supabase account</li>
+          </ul>
+        </section>
+
+        <section data-markdown="" data-background-color="#212121">
+          <textarea data-template>
+## Introduction to
+<img src="images/Remix_Logo_Dark_Glowing.png" height="auto" width="500" />
+---
+### What is Remix?
+
+- A full-stack framework for React
+	- by the authors of React Router
+- Server rendering **first**
+- Data fetching
+- Routing
+- Form handling
+- etc.
+---
+### Why Remix?
+
+- Better performance
+- Better developer experience
+- Better SEO
+- <a href="https://remix.run" target="_blank">https://remix.run</a>
+---
+But let's start with React first
+### React component
+
+```
+import React from 'react';
+
+const Component = ({ name }) => {
+	return <h1>Hello, {name}!</h1>;
+}
+```
+---
+### Remix route
+
+`/app/routes/$slug`
+
+``` [1-10|1-4|5-10]
+export const loader = async ({ params }) => {
+	const fullName = getFullName(params.slug)
+	return { fullName };
+};
+
+const Component = ({ name }) => {
+	const { fullName } = useLoaderData();
+	return <h1>Hello, {fullName}!</h1>;
+}
+export default Component;
+```
+
+<a href="https://remix.run/docs/en/main/route/loader" target="_blank">https://remix.run/docs/en/main/route/loader</a>
+
+---
+### Remix route with form
+
+``` [1-4|5-8|10-17]
+export const loader = async ({ params }) => {
+	const fullName = getFullName(params.slug)
+	return { fullName };
+};
+
+export const action = async ({ request }) => {
+	...
+}
+
+const Component = ({ name }) => {
+	const { fullName } = useLoaderData();
+	return (<div>
+	<h1>Hello, {fullName}!</h1>
+	<Form action={action} />...</Form>
+	</div>);
+}
+export default Component;
+```
+
+---
+### Remix router
+
+- file-based routing
+- nested routes
+
+```
+	app/
+├── routes/
+│   ├── _index.tsx
+│   ├── about.tsx
+│   ├── concerts.$city.tsx
+│   └── concerts.trending.tsx
+└── root.tsx
+```
+
+<a href="https://remix.run/docs/en/main/file-conventions/routes" target="_blank">Route File Naming Documentation</a>
+---
+### Other file conventions
+- Root Layout - app/root.tsx
+- Client modules - *.client.ts
+- Server modules - *.server.ts
+---
+### TypeScript
+
+- Annoyance in the beginning
+- Improves Dev. eXperience in the long run
+	- auto-completed code
+	- self-documented code
+	- type-safe data flow
+---
+### Wrangler
+
+- Cloudflare CLI
+- wrangler.toml - configuration
+- e.g. \`wrangler types\`
+---
+### All labs and hints
+
+<a href="https://github.com/pavestru/remix-workshop" target="_blank">https://github.com/pavestru/remix-workshop</a>
+		  </textarea
+          >
+        </section>
+
+        <!-- ----------------------------------------------------- -->
+        <!-- Module 2 -->
+
+        <section data-markdown="" data-background-color="#212121">
+          <textarea data-template>
+## 2.
+### Authentication with
+<img src="images/supabase-logo-dark.png" height="auto" width="500" />
+---
+### What is Supabase Auth?
+
+- easily implement authentication and authorization
+- popular Auth methods:
+- password
+- magic link
+- one-time password (OTP)
+- social login (GitHub, Google etc.)
+- single sign-on (SSO)
+---
+### Initiating a session
+
+- session is created when user signs in
+- is represented in the form of a JWT and a refresh token
+- session terminates when user signs out, due to inactivity, reaches maximum lifetime etc.
+- two flows for initiating a session and receiving tokens
+- Implicit flow
+- PKCE flow
+---
+### PKCE flow
+
+<img src="images/o-auth-pkce-flow.png"  />
+more: <a href="https://supabase.com/docs/guides/auth/sessions/pkce-flow" target="_blank">PKCE flow</a>
+
+			</textarea>
+        </section>
+
+		<section data-markdown="">
+			<textarea data-template>
+### Lab 2: Authentication
+
+Go to <a href="https://github.com/pavestru/remix-workshop/blob/main/lab_2.md" target="_blank">Lab 2 assignment</a>
+
+How it could look like:
+
+<img src="images/lab-2-result.png" />
+			</textarea>
+		  </section>
+	  
+        <!-- ----------------------------------------------------- -->
+        <!-- Module 3 -->
+
+		<section data-markdown="" data-background-color="#212121">
+			<textarea data-template>
+### 3. Database on Cloudflare
+---
+## KV storage
+- key-value data store
+- high read volumes with low latency
+- available in free and paid ties
+
+more [KV pricing](https://developers.cloudflare.com/kv/platform/pricing)
+---
+### Database access
+
+- DB layer provided in db.server.ts (read it!)
+- Generate types: npm run typegen
+---
+### Loader
+```jsx [1-10|1-4|5-10]
+export const loader = async ({ params }) => {
+	const data = getData(params.id)
+	return { data };
+};
+
+const Component = ({ name }) => {
+	const { data } = useLoaderData<typeof loader>();
+	/* your code goes here */;
+}
+export default Component;
+```
+		  	</textarea>
+		  </section>
+
+		  <section data-markdown="">
+			<textarea data-template>
+### Lab 3: Database
+
+Go to <a href="https://github.com/pavestru/remix-workshop/blob/main/lab_3.md" target="_blank">Lab 3 assignment</a>
+
+How it could look like:
+	  
+<img src="images/lab-3-result.png" />
+			</textarea>
+		  </section>		  
+
+        <!-- ----------------------------------------------------- -->
+        <!-- Module 4 -->
+
+		<section data-markdown="" data-background-color="#212121">
+			<textarea data-template>
+# 4. Forms
+---
+## Forms in Remix
+
+- submits data to actions via fetch
+- prevents the default browser behaviour
+
+```jsx [1-2||3-6]
+export const action = async () => {...};
+
+const Component = ()=> {
+	return (
+	<Form method="post">
+		{/* existing elements */}
+	</Form>
+	)
+}
+---
+## Route Action
+
+```jsx
+export async function action({
+	request,
+}: ActionFunctionArgs) {
+	const formData = await request.formData();
+	const user = await getUser(request);
+
+	await updateUser(user.id, {
+	email: formData.get("email"),
+	displayName: formData.get("displayName"),
+	});
+
+	return json({ ok: true });
+}
+more <a href="https://remix.run/docs/en/main/discussion/data-flow#route-action" target="_blank">Route Action</a>
+---
+### fetcher.Form
+
+API for optimistic updates that don't trigger navigation.
+
+```jsx
+export default function Component() {
+	const fetcher = useFetcher();
+	return (
+	<fetcher.Form method="post">
+		<input type="text" name="email" />
+		<input type="text" name="displayName" />
+		<button type="submit">Submit</button>
+	</form>
+	);
+}
+			</textarea>
+		  </section>
+
+		  <section data-markdown="">
+			<textarea data-template>
+### Lab 4: Form
+
+Go to <a href="https://github.com/pavestru/remix-workshop/blob/main/lab_4.md" target="_blank">Lab 4 assignment</a>
+
+How it could look like:
+
+<img src="images/lab-4-result.png" />
+			</textarea>
+		  </section>		  
+
+        <!-- ----------------------------------------------------- -->
+        <!-- Wrap up -->
+
+		<section data-markdown="" data-background-color="#212121">
+			<textarea data-template>
+# Wrap Up
+---
+## Application features missing
+
+- **Analytics**
+- User management
+---
+## Cloudflare - the weird
+
+- SQLite vs KV
+- platform lock-in
+	- move to SQLite (use ORM)
+	- rename @remix-run/cloudflare to @remix-run/node
+---
+## Remix Stacks Rock!
+
+- <a href="https://remix.run/docs/en/main/guides/templates#stacks" target="_blank">Remix Stacks</a>
+---
+## Remix - The bad and ugly
+
+- Not suitable for single-page-apps (yet?)
+	- this presentation is/was a Remix SPA (ugly)
+
+---
+## Remix - The good and bad (trade-offs)
+
+- Coupling of client and server
+- No React Server Components (yet?)
+---
+<img src="images/dead_remix.png" height="auto" width="500" />
+
+Remix is dead...
+
+- <a href="https://remix.run/blog" target="_blank">https://remix.run/blog</a>
+---
+<img src="images/remix-react-router-spider-man.png" height="auto" width="800" />
+---
+<img src="images/reactrouter_logo_dark.png" height="auto" width="500" />
+
+Long live React Router!
+---
+### Until next time...
+
+React Router Workshop?
+		  	</textarea>
+		  </section>		
+      </div>
+    </div>
+
+    <script src="dist/reveal.js"></script>
+    <script src="plugin/zoom/zoom.js"></script>
+    <script src="plugin/notes/notes.js"></script>
+    <script src="plugin/search/search.js"></script>
+    <script src="plugin/markdown/markdown.js"></script>
+    <script src="plugin/highlight/highlight.js"></script>
+    <script>
+      // Also available as an ES module, see:
+      // https://revealjs.com/initialization/
+      Reveal.initialize({
+        controls: true,
+        progress: true,
+        center: true,
+        hash: true,
+
+        // Learn about plugins: https://revealjs.com/plugins/
+        plugins: [
+          RevealZoom,
+          RevealNotes,
+          RevealSearch,
+          RevealMarkdown,
+          RevealHighlight,
+        ],
+      });
+    </script>
+  </body>
+</html>
